@@ -1,0 +1,51 @@
+		.customEditingToolbar {
+            float: right;
+            right: 25px;
+            height: 30px; 
+        }
+        .customEditingToolbar div {
+            float: right;
+            margin: 5px;
+            width: 24px;
+            height: 24px;
+        }
+        .olControlDrawFeaturePolygonItemInactive { 
+            background-image: url("../img/editing_tool_bar.png");
+            background-repeat: no-repeat;
+            background-position: -26px 0px; 
+        }
+        .olControlDrawFeaturePolygonItemActive { 
+            background-image: url("../img/editing_tool_bar.png");
+            background-repeat: no-repeat;
+            background-position: -26px -23px ;                                                                   
+        }
+        .olControlModifyFeatureItemActive { 
+            background-image: url(../img/move_feature_on.png);
+            background-repeat: no-repeat;
+            background-position: 0px 1px;
+        }
+        .olControlModifyFeatureItemInactive { 
+            background-image: url(../img/move_feature_off.png);
+            background-repeat: no-repeat;
+            background-position: 0px 1px;
+        }
+        .olControlDeleteFeatureItemActive { 
+            background-image: url(../img/remove_point_on.png);
+            background-repeat: no-repeat;
+            background-position: 0px 1px;
+        }
+        .olControlDeleteFeatureItemInactive { 
+            background-image: url(../img/remove_point_off.png);
+            background-repeat: no-repeat;
+            background-position: 0px 1px;
+        }
+        div.olControlSaveFeaturesItemActive {
+    background-image: url(../img/save_features_on.png);
+    background-repeat: no-repeat;
+    background-position: 0 1px;
+}
+div.olControlSaveFeaturesItemInactive {
+    background-image: url(../img/save_features_off.png);
+    background-repeat: no-repeat;
+    background-position: 0 1px;
+}

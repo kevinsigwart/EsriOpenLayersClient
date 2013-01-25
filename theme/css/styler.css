@@ -1,0 +1,111 @@
+body {
+    margin: 1em;
+    font-family: sans-serif;
+}
+h1, h2, h3, h4 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+/**
+ * PointSymbolizer
+ */
+.gx-pointsymbolizer-mark-item img {
+    vertical-align: text-bottom;
+}
+.gx-pointsymbolizer-mark-item span {
+    margin-left: 0.5em;
+}
+
+.gx-zoomslider {
+    top: 90px;
+    left: 17px
+}
+
+.x-btn .add {
+    background-image: url(../img/add.png);
+}
+
+.x-btn .delete {
+    background-image: url(../img/delete.png);
+}
+
+.x-btn .save {
+    background-image: url(../img/palette.png);
+}
+
+.x-btn .cancel {
+    background-image: url(../img/cancel.png);
+}
+
+.x-btn-icon .expand {
+    background-image: url(../img/arrow_down.png);
+}
+
+.x-btn-icon .collapse {
+    background-image: url(../img/arrow_up.png);
+}
+
+.x-btn-icon .trash {
+    background-image: url(../img/bin_empty.png);
+}
+
+.x-btn-icon .magnify {
+    background-image: url(../img/magnifier.png);
+}
+
+/* Pan- and Zoom- Panel Styles*/
+
+.olControlPanPanel div {
+    background-image:url(../../externals/ext/resources/images/gray/panel/tool-sprites.gif);
+    height:15px;
+    width:15px;
+    /* workaround for button height in IE */
+    font-size:0px;
+}
+
+.olControlPanPanel .olControlPanNorthItemInactive {
+    background-position:15px -60px;
+    left:16px
+}
+.olControlPanPanel .olControlPanEastItemInactive {
+    background-position:15px -120px;
+    left: 30px;
+    top: 16px;
+}
+.olControlPanPanel .olControlPanSouthItemInactive {
+    background-position:15px -75px;
+    left: 16px;
+    top: 32px;
+}
+.olControlPanPanel .olControlPanWestItemInactive {
+    background-position:15px -105px;
+    left: 2px;
+    top: 16px;
+}
+
+.olControlZoomPanel { 
+    left:21px;
+}
+
+.olControlZoomPanel div {
+    background-image:url(../../externals/ext/resources/images/gray/panel/tool-sprites.gif);
+    height:15px;
+    width:15px;
+    /* workaround for button height in IE */
+    font-size:0px;
+}
+
+.olControlZoomPanel .olControlZoomInItemInactive {
+    background-position:15px -240px;
+}
+
+.olControlZoomPanel .olControlZoomToMaxExtentItemInactive {
+    display: none;
+}
+
+.olControlZoomPanel .olControlZoomOutItemInactive {
+    background-position:15px -255px;
+    top: 123px;
+}
+

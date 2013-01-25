@@ -1,0 +1,65 @@
+        .olControlPanel {
+            float: left;
+            left: 60px;
+            height: 30px; 
+            top: 20px;
+            cursor: pointer;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, .6);
+    	}
+    	.olControlPanel div  {
+            float: left;
+            margin:5px;
+            width: 45px;
+            height: 20px;
+    	}
+        .olControlButton2000ItemActive { 
+            background-image: url(../img/2000Act.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton2000ItemInactive { 
+            background-image: url(../img/2000InAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton2025ItemActive { 
+            background-image: url(../img/2025Act.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton2025ItemInactive { 
+            background-image: url(../img/2025InAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton2050ItemActive { 
+            background-image: url(../img/2050Act.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton2050ItemInactive { 
+            background-image: url(../img/2050InAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton2075ItemActive { 
+            background-image: url(../img/2075Act.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton2075ItemInactive { 
+            background-image: url(../img/2075InAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton3000ItemActive { 
+            background-image: url(../img/3000Act.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton3000ItemInactive { 
+            background-image: url(../img/3000InAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
