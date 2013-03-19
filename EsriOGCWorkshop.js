@@ -106,6 +106,10 @@ function saveFinished(evt){
 }
 
 function initMap(layerInfo) {
+	
+	//Adding an OSM Layer as the initial basemap
+	var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
+	
 	/*
 	 * The initialize function in this layer has the ability to automatically configure
 	 * itself if given the JSON capabilities object from the ArcGIS map server.
@@ -118,9 +122,10 @@ function initMap(layerInfo) {
 	var baseLayer = new OpenLayers.Layer.ArcGISCache("ArcGIS Cached Gray Map", layerURL, {
 		layerInfo : layerInfo
 	});
-
+	
+	
 	/*
-	 * Make sure our baselayer and our map are synced up
+	 * Make sure our baselayer and our map are synced up.
 	 */
 	map = new OpenLayers.Map('map', {
 		maxExtent : baseLayer.maxExtent,
@@ -128,33 +133,44 @@ function initMap(layerInfo) {
 		resolutions : baseLayer.resolutions,
 		numZoomLevels : baseLayer.numZoomLevels,
 		tileSize : baseLayer.tileSize,
-		displayProjection : baseLayer.displayProjection
-	});
-	map.addLayers([baseLayer]);
-	
-	var baseLayer2 = new OpenLayers.Layer.ArcGISCache("Street Map", "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer", {
-		layerInfo : layerInfo
+		projection: new OpenLayers.Projection("EPSG:3857"),
+        displayProjection: new OpenLayers.Projection("EPSG:3857"),
+        units: "m"
 	});
 	
+	/*
+	 * A WMTS Map from an ArcGIS Server 10.1
+	 */
     var wmts = new OpenLayers.Layer.WMTS({
         name: "WMTS",
-        url: "http://ksigwart:6080/arcgis/rest/services/NorfolkImagery/MapServer/WMTS/",
+        url: "http://wdcb4.esri.com/arcgis/rest/services/201212_NetCDF_Viewer/NorfolkImagery/MapServer/WMTS/",
         layer: "0",
         matrixSet: "EPSG:3857",
         format: "image/png",
         style: "_null",
         opacity: 1,
-        isBaseLayer: false
+        isBaseLayer: true
         
     }); 
     wmts.setVisibility(false);
     
-    map.addLayers([baseLayer2,wmts]);
+    //Adding all the basemaps to the map.
+    map.addLayers([OSMlayer,baseLayer,wmts]);
     
+    //An Esri Polygon Map Service from a 10.1 ArcGIS Server
+	var osmPoly = new OpenLayers.Layer.ArcGIS93Rest("OSM Polys-Esri MapService", "http://wdcb4.esri.com/arcgis/rest/services/201212_NetCDF_Viewer/NorfolkPolygons/MapServer/export", {
+	    layers: "show:1,2,3,4,5",
+		transparent:true,		
+		isBaseLayer:false
+	});	
+	
+	osmPoly.setVisibility(false);
+	
+	map.addLayers([osmPoly]);
 
-	//Polygon WMS Dataset of buildings
-	var polygons = new OpenLayers.Layer.WMS("Polygons", "http://wdcb4.esri.com/arcgis/services/201212_NetCDF_Viewer/NorfolkPolygons/MapServer/WMSServer", {
-		layers : "2,3,4,5,6,7,8",
+	//A WMS Polyline dataset coming from a 10.1 ArcGIS Server
+	var osmLine = new OpenLayers.Layer.WMS("OSM Roads-Esri WMS", "http://wdcb4.esri.com/arcgis/services/201212_NetCDF_Viewer/NorfolkLines/MapServer/WMSServer", {
+		layers : "2,7,8",
 		format : "image/gif",
 		transparent : "true"
 	}, {
@@ -163,12 +179,12 @@ function initMap(layerInfo) {
 		wrapDateLine : false
 	});
 	
-	polygons.setVisibility(false);
+	osmLine.setVisibility(false);
 	
-	map.addLayers([polygons]);
+	map.addLayers([osmLine]);
 
-	//Time enabled WMS of Projected Inundation
-	innundationWMS = new OpenLayers.Layer.WMS("Inundation", "http://wdcb4.esri.com/arcgis/services/201212_NetCDF_Viewer/norfolk_SeaLevelRise/MapServer/WMSServer", {
+	//Time enabled WMS of Projected Inundation coming from an Esri ArcGIS Server 10.1
+	innundationWMS = new OpenLayers.Layer.WMS("Inundation Esri WMS-wTime", "http://wdcb4.esri.com/arcgis/services/201212_NetCDF_Viewer/norfolk_SeaLevelRise/MapServer/WMSServer", {
 		layers : "0",
 		format : "image/gif",
 		transparent : "true",
@@ -179,12 +195,12 @@ function initMap(layerInfo) {
 		wrapDateLine : false
 	});
 	
-	innundationWMS.setVisibility(true);
+	innundationWMS.setVisibility(false);
 	
 	map.addLayers([innundationWMS]);
 	
 	//Adding a WMS of the site selection, because the WFS is not rendering within open layers
-	siteSelWMS = new OpenLayers.Layer.WMS("Site Selection", "http://wdcb4.esri.com/arcgis/services/SiteSelection/MapServer/WMSServer", {
+	siteSelWMS = new OpenLayers.Layer.WMS("Site Selection Esri WMS", "http://wdcb4.esri.com/arcgis/services/SiteSelection/MapServer/WMSServer", {
 		layers : "0",
 		format : "image/gif",
 		transparent : "true"
@@ -204,7 +220,7 @@ function initMap(layerInfo) {
     var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
     renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
 	
-	var wfstLyr = new OpenLayers.Layer.Vector("WFST Without Lock", {
+	var wfstLyr = new OpenLayers.Layer.Vector("Esri WFST Without Lock", {
 		strategies : [new OpenLayers.Strategy.BBOX(), saveStrategy],
 		projection : new OpenLayers.Projection("EPSG:3857"),
 		protocol : new OpenLayers.Protocol.WFS({
