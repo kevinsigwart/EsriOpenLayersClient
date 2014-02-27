@@ -98,11 +98,15 @@ function saveFinished(evt){
 	alert("Save Successful");
 }
 
+/**
+*Adds the Attribute information to the feature being edited.
+*/
 function addAttributeInformation(tempFeature)
 {
     tempFeature.attributes.currentlocation = 'pen';
 	wfstLayer.redraw(true);
 }
+
 
 function initMap(layerInfo) {
 	
@@ -198,7 +202,7 @@ function initMap(layerInfo) {
 	
 	map.addLayers([innundationWMS]);
 	
-	//Adding a WMS of the site selection, because the WFS is not rendering within open layers
+	//Adding a WMS of the site selection.
 	siteSelWMS = new OpenLayers.Layer.WMS("Site Selection Esri WMS", "http://dtc-sci02.esri.com/arcgis/services/SiteSelection/MapServer/WMSServer", {
 		layers : "0",
 		format : "image/gif",
@@ -274,10 +278,7 @@ function initMap(layerInfo) {
 		})
 	});
 	
-
-			
-
-	
+	//Add WFS-T to the map.
 	wfstLayer = new OpenLayers.Layer.Vector("Esri WFST Without Lock", {
 		strategies : [new OpenLayers.Strategy.BBOX(), saveStrategy],
 		projection : new OpenLayers.Projection("EPSG:3857"),
@@ -343,6 +344,16 @@ function initMap(layerInfo) {
         displayClass: "olControlModifyFeature"
     });
 
+	//When a WFS-T is modified we clear out the attributes.
+	wfstLayer.events.on({
+     'afterfeaturemodified': function(evt) {
+		//We don't want to update the attributes, only the geometry, so we clear them out.
+		//This is because you cannot edit the OBJECTID.  Another option is to just blow out the
+		//ObjectID too.
+		evt.feature.attributes = {};
+     }
+    });
+	
     var del = new DeleteFeature(wfstLayer, {title: "Delete Feature"});
    
     var save = new OpenLayers.Control.Button({
