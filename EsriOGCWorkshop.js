@@ -1,4 +1,5 @@
 var map,siteSelWMS, layerURL = "http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer";
+var wfstLayer;
 var innundationWMS;
 var button2025,button2075,button2000,button2050,button3000;
 
@@ -34,7 +35,7 @@ function init() {
 	var jsonp = new OpenLayers.Protocol.Script();
 	
 	OpenLayers.ProxyHost= function(url) {
-		return "/dev.summit.2012/ApacheProxyServlet?url=" + url;
+		return "/sharing/proxy.ashx?" + url;
     };
 	
 	jsonp.createRequest(layerURL, {
@@ -90,19 +91,17 @@ function updateTime(evt)
 	innundationWMS.redraw(true);
 }
 			
-function saveStarted (evt) {
-    //Setting the current location attribute to pending.
-    if(evt != null && evt.features != {})
-    	evt.features[0].attributes.currentlocation = 'pen';
-}  
-
 function saveFinished(evt){
-	
-	var layer = evt.object.layer;
-	layer.removeAllFeatures();
-	layer.refresh();
-	siteSelWMS.redraw(true);
-	alert("Save Complete");
+
+    //Updating the WMS
+    siteSelWMS.redraw(true);
+	alert("Save Successful");
+}
+
+function addAttributeInformation(tempFeature)
+{
+    tempFeature.attributes.currentlocation = 'pen';
+	wfstLayer.redraw(true);
 }
 
 function initMap(layerInfo) {
@@ -143,7 +142,7 @@ function initMap(layerInfo) {
 	 */
     var wmts = new OpenLayers.Layer.WMTS({
         name: "WMTS",
-        url: "http://wdcb4.esri.com/arcgis/rest/services/201212_NetCDF_Viewer/NorfolkImagery/MapServer/WMTS/",
+        url: "http://dtc-sci02.esri.com/arcgis/rest/services/201311_OGCDemos/NofolkMultispectral/ImageServer/WMTS/",
         layer: "0",
         matrixSet: "EPSG:3857",
         format: "image/png",
@@ -158,7 +157,7 @@ function initMap(layerInfo) {
     map.addLayers([OSMlayer,baseLayer,wmts]);
     
     //An Esri Polygon Map Service from a 10.1 ArcGIS Server
-	var osmPoly = new OpenLayers.Layer.ArcGIS93Rest("OSM Polys-Esri MapService", "http://wdcb4.esri.com/arcgis/rest/services/201212_NetCDF_Viewer/NorfolkPolygons/MapServer/export", {
+	var osmPoly = new OpenLayers.Layer.ArcGIS93Rest("OSM Polys-Esri MapService", "http://dtc-sci02.esri.com/arcgis/rest/services/201311_OGCDemos/OSMPolys/MapServer/export", {
 	    layers: "show:1,2,3,4,5",
 		transparent:true,		
 		isBaseLayer:false
@@ -169,7 +168,7 @@ function initMap(layerInfo) {
 	map.addLayers([osmPoly]);
 
 	//A WMS Polyline dataset coming from a 10.1 ArcGIS Server
-	var osmLine = new OpenLayers.Layer.WMS("OSM Roads-Esri WMS", "http://wdcb4.esri.com/arcgis/services/201212_NetCDF_Viewer/NorfolkLines/MapServer/WMSServer", {
+	var osmLine = new OpenLayers.Layer.WMS("OSM Roads-Esri WMS", "http://dtc-sci02.esri.com/arcgis/services/201311_OGCDemos/NofolkOSMLines/MapServer/WMSServer", {
 		layers : "2,7,8",
 		format : "image/gif",
 		transparent : "true"
@@ -184,7 +183,7 @@ function initMap(layerInfo) {
 	map.addLayers([osmLine]);
 
 	//Time enabled WMS of Projected Inundation coming from an Esri ArcGIS Server 10.1
-	innundationWMS = new OpenLayers.Layer.WMS("Inundation Esri WMS-wTime", "http://wdcb4.esri.com/arcgis/services/201212_NetCDF_Viewer/norfolk_SeaLevelRise/MapServer/WMSServer", {
+	innundationWMS = new OpenLayers.Layer.WMS("Inundation Esri WMS-wTime", "http://dtc-sci02.esri.com/arcgis/services/201311_OGCDemos/NorfolkInundationNetCDF/MapServer/WMSServer", {
 		layers : "0",
 		format : "image/gif",
 		transparent : "true",
@@ -200,7 +199,7 @@ function initMap(layerInfo) {
 	map.addLayers([innundationWMS]);
 	
 	//Adding a WMS of the site selection, because the WFS is not rendering within open layers
-	siteSelWMS = new OpenLayers.Layer.WMS("Site Selection Esri WMS", "http://wdcb4.esri.com/arcgis/services/SiteSelection/MapServer/WMSServer", {
+	siteSelWMS = new OpenLayers.Layer.WMS("Site Selection Esri WMS", "http://dtc-sci02.esri.com/arcgis/services/SiteSelection/MapServer/WMSServer", {
 		layers : "0",
 		format : "image/gif",
 		transparent : "true"
@@ -209,42 +208,97 @@ function initMap(layerInfo) {
 		isBaseLayer : false,
 		wrapDateLine : false
 	});
-	
+	siteSelWMS.setVisibility(false);
 	map.addLayers([siteSelWMS]);
 	
 	var saveStrategy = new OpenLayers.Strategy.Save();
-	
-	saveStrategy.events.register('start', null, saveStarted);
 	saveStrategy.events.register('success',null,saveFinished);
 	
-    var renderer = OpenLayers.Util.getParameters(window.location.href).renderer;
-    renderer = (renderer) ? [renderer] : OpenLayers.Layer.Vector.prototype.renderers;
+	var styleMap = new OpenLayers.StyleMap({
+		"default": new OpenLayers.Style({
+			fillColor: "#336699",
+			fillOpacity: 0.4, 
+			hoverFillColor: "white",
+			hoverFillOpacity: 0.8,
+			strokeColor: "#003366",
+			strokeOpacity: 0.8,
+			strokeWidth: 2,
+			strokeLinecap: "round",
+			strokeDashstyle: "solid",
+			hoverStrokeColor: "red",
+			hoverStrokeOpacity: 1,
+			hoverStrokeWidth: 0.2,
+			pointRadius: 6,
+			hoverPointRadius: 1,
+			hoverPointUnit: "%",
+			pointerEvents: "visiblePainted",
+			cursor: "inherit"
+		}),
+            "select": new OpenLayers.Style({
+			fillColor: "#ffcc00",
+			fillOpacity: 0.4, 
+			hoverFillColor: "white",
+			hoverFillOpacity: 0.6,
+			strokeColor: "#ff9900",
+			strokeOpacity: 0.6,
+			strokeWidth: 2,
+			strokeLinecap: "round",
+			strokeDashstyle: "solid",
+			hoverStrokeColor: "red",
+			hoverStrokeOpacity: 1,
+			hoverStrokeWidth: 0.2,
+			pointRadius: 6,
+			hoverPointRadius: 1,
+			hoverPointUnit: "%",
+			pointerEvents: "visiblePainted",
+			cursor: "pointer"
+        }),
+		"temporary": new OpenLayers.Style({        
+			fillColor: "#587058",
+			fillOpacity: 0.4, 
+			hoverFillColor: "white",
+			hoverFillOpacity: 0.8,
+			strokeColor: "#587498",
+			strokeOpacity: 0.8,
+			strokeLinecap: "round",
+			strokeWidth: 2,
+			strokeDashstyle: "solid",
+			hoverStrokeColor: "red",
+			hoverStrokeOpacity: 1,
+			hoverStrokeWidth: 0.2,
+			pointRadius: 6,
+			hoverPointRadius: 1,
+			hoverPointUnit: "%",
+			pointerEvents: "visiblePainted",
+			cursor: "inherit"
+		})
+	});
 	
-	var wfstLyr = new OpenLayers.Layer.Vector("Esri WFST Without Lock", {
+
+			
+
+	
+	wfstLayer = new OpenLayers.Layer.Vector("Esri WFST Without Lock", {
 		strategies : [new OpenLayers.Strategy.BBOX(), saveStrategy],
 		projection : new OpenLayers.Projection("EPSG:3857"),
+		styleMap: styleMap,
 		protocol : new OpenLayers.Protocol.WFS({
 			version : "1.1.0",
 			srsName : "EPSG:3857",
-			url : "http://wdcb4.esri.com/arcgis/services/SiteSelection/MapServer/WFSServer?",
-			featureNS : "http://www.esri.com",
+			url : "http://dtc-sci02.esri.com/arcgis/services/SiteSelection/MapServer/WFSServer?",
+			//featureNS : "http://www.esri.com",
 			// the featurePrefix doesn't apply when encoding features using GML3 format
 			//   OpenLayers.Format.WFSTWithLock fixes this by overriding the GML3 feature encoder
 			featurePrefix : "esri",
 			featureType : "SiteLocations",
-			geometryName : "shape",
-			schema : "http://wdcb4.esri.com/arcgis/services/SiteSelection/MapServer/WFSServer?request=describefeaturetype&typename=SiteSelection:SiteLocations",
-			formatOptions : {
-				extractAttributes : true,
-				xy:true
-			}
-		}),
-		renderers: renderer
-	});
+			geometryName : "SHAPE",
+			schema : "http://dtc-sci02.esri.com/arcgis/services/SiteSelection/MapServer/WFSServer?request=describefeaturetype&typename=SiteSelection:SiteLocations"
+			        })
+    });
 	
-	wfstLyr.setVisibility(true);
+	wfstLayer.setVisibility(true);
 	
-	map.addLayers([wfstLyr]);
+	map.addLayers([wfstLayer]);
 	
 
 	button2000 = new OpenLayers.Control.Button({
@@ -274,21 +328,22 @@ function initMap(layerInfo) {
     
 	
     var draw = new OpenLayers.Control.DrawFeature(
-    	wfstLyr, OpenLayers.Handler.Polygon,
+    	wfstLayer, OpenLayers.Handler.Polygon,
         {
             title: "Draw Feature",
             displayClass: "olControlDrawFeaturePolygon",
-            multi: true
+            multi: true,
+			featureAdded:addAttributeInformation
         }
     );
     	
     
-    var edit = new OpenLayers.Control.ModifyFeature(wfstLyr, {
+    var edit = new OpenLayers.Control.ModifyFeature(wfstLayer, {
         title: "Modify Feature",
         displayClass: "olControlModifyFeature"
     });
 
-    var del = new DeleteFeature(wfstLyr, {title: "Delete Feature"});
+    var del = new DeleteFeature(wfstLayer, {title: "Delete Feature"});
    
     var save = new OpenLayers.Control.Button({
         title: "Save Changes",
