@@ -5,7 +5,7 @@ This example shows how you can bring in OGC Standards coming from an ArcGIS Serv
 Also, since Esri Rest Specification is now OPEN, it's possible to bring in MapServices and Cached maps into the Open Layers Client.
 
 ## Open Layers Version
-This example uses OpenLayers 2.13.1
+This example uses OpenLayers 2.12
 
 ## Getting OpenLayers
 
