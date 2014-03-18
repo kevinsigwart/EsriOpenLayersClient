@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<title>OpenLayers WMS from ArcGIS Server</title>
+		<link rel="stylesheet" href="theme/css/style.css" type="text/css">
+		<link rel="stylesheet" href="theme/css/dateToolbarStyler.css" type="text/css">
+		<style type="text/css">
+			html, body, #map {
+				margin: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#text {
+				position: absolute;
+				bottom:1em;
+				left: 1em;
+				width: 350px;
+				z-index: 20000;
+			      border:solid 1px #999;
+			      background-color:rgba(227,233,238,.8);
+			      -webkit-border-bottom-left-radius:4px;
+			      -webkit-border-bottom-right-radius:4px;
+			      -moz-border-radius-bottomleft:4px;
+			      -moz-border-radius-bottomright:4px;
+			      -webkit-border-top-left-radius:4px;
+			      -webkit-border-top-right-radius:4px;
+			      -moz-border-radius-topleft:4px;
+			      -moz-border-radius-topright:4px;
+			      border-bottom-left-radius:4px;
+			      border-bottom-right-radius:4px;
+			      border-top-left-radius:4px;
+			      border-top-right-radius:4px;
+			      text-align:center;
+			      height:auto;
+			      margin:0;
+			}
+		</style>
+
+		<script src="lib/OpenLayers.js"></script>
+    <script type="text/javascript">
+		var map;
+		var innundationWMS;
+		var button2025,button2075,button2000,button2050,button3000;
+        
+        /**
+         * Updates the WMS time according to the button pressed.  
+         */
+        function updateTime(evt) {
+            
+            //Deactivates all the buttons, activates the button
+            deactivateButtons(); 
+            
+			if(this.title == '2000')
+				innundationWMS.params.TIME = "2000-01-01";
+			else if(this.title == '2025')
+				innundationWMS.params.TIME = "2025-01-01";
+			else if(this.title == '2050')
+				innundationWMS.params.TIME = "2050-01-01";
+			else if(this.title == '2075')
+				innundationWMS.params.TIME = "2075-01-01";
+			else if(this.title == '3000')
+				innundationWMS.params.TIME = "2099-01-01";
+            
+            //Activate Button Clicked
+			this.activate();
+			
+			innundationWMS.redraw(true);
+		}
+        
+        /**
+         * Deactivates all the buttons
+         */
+        function deactivateButtons() {
+            
+            button2000.deactivate();
+            button2025.deactivate();
+			button2050.deactivate();
+            button2075.deactivate();
+            button3000.deactivate();
+        }
+		
+        function init() {
+        	//Using OSM Layer as the basemap
+	        var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
+            
+            //Creating a Map
+			map = new OpenLayers.Map('map', {
+				maxExtent : OSMlayer.maxExtent,
+				units : OSMlayer.units,
+				numZoomLevels : OSMlayer.numZoomLevels,
+				projection: new OpenLayers.Projection("EPSG:3857"),
+		        displayProjection: new OpenLayers.Projection("EPSG:3857"),
+			});
+			
+			map.addLayers([OSMlayer]);
+            
+			//Time enabled WMS of Projected Inundation coming from an Esri ArcGIS Server 10.1
+			innundationWMS = new OpenLayers.Layer.WMS("Inundation Esri WMS-wTime", "http://dtc-sci02.esri.com/arcgis/services/201311_OGCDemos/NorfolkInundationNetCDF/MapServer/WMSServer", {
+				layers : "0",
+				format : "image/gif",
+				transparent : "true",
+				time : "2000-01-01"
+			}, {
+				opacity : 0.75,
+				isBaseLayer : false,
+				wrapDateLine : false
+			});
+			
+			innundationWMS.setVisibility(true);
+			map.addLayers([innundationWMS]);
+			
+            map.zoomToExtent(new OpenLayers.Bounds(-8502582, 4421100, -8478963, 4437515));
+            
+            //Adding Time Buttons to initiate time changes
+        	button2000 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButton2000",title:"2000", trigger: updateTime
+			});
+			button2025 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButton2025",title:"2025", trigger: updateTime
+			});
+			button2050 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButton2050",title:"2050", trigger: updateTime
+			});
+			button2075 = new OpenLayers.Control.Button({
+						'displayClass': 'olControlButton2075',title:"2075", trigger: updateTime
+			});
+			button3000 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButton3000",title:"3000", trigger: updateTime
+			});
+			
+			//The time panel will have a button for years 2000 - 3000 in 25 year intervals
+			var timePanel = new OpenLayers.Control.Panel({defaultControl: button2000});
+			timePanel.addControls([button2000,button2025,button2050,button2075,button3000]);
+			
+			//Adding the Time Toolbar
+    		map.addControl(timePanel);
+        }
+    </script>
+	</head>
+	<body  onload="init()">
+		<div id="map"></div>
+		<div id="text">
+			<h1 id="title">WMS-Time Example</h1>
+
+			<p id="shortdesc">
+				Demonstrates using WMS with Time service from ArcGIS Server. Use the time panel on the upper left side to change the time. 
+			</p>
+		</div> 
+		<a href="https://github.com/kevinsigwart/EsriOpenLayersClient"><img style="z-index: 2001; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+	</body>
+</html>

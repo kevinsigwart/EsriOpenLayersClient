@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<title>OpenLayers: ArcGIS Server WMS w\SLD</title>
+		<link rel="stylesheet" href="theme/css/style.css" type="text/css">
+		<style type="text/css">
+			html, body, #map {
+				margin: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#text {
+				position: absolute;
+				bottom: 1em;
+				left: 1em;
+				width: 250px;
+				z-index: 20000;
+			      border:solid 1px #999;
+			      background-color:rgba(227,233,238,.6);
+			      -webkit-border-bottom-left-radius:4px;
+			      -webkit-border-bottom-right-radius:4px;
+			      -moz-border-radius-bottomleft:4px;
+			      -moz-border-radius-bottomright:4px;
+			      -webkit-border-top-left-radius:4px;
+			      -webkit-border-top-right-radius:4px;
+			      -moz-border-radius-topleft:4px;
+			      -moz-border-radius-topright:4px;
+			      border-bottom-left-radius:4px;
+			      border-bottom-right-radius:4px;
+			      border-top-left-radius:4px;
+			      border-top-right-radius:4px;
+			      text-align:center;
+			      height:auto;
+			      margin:0;
+			}
+		</style>
+
+		<script src="lib/OpenLayers.js"></script>
+    <script type="text/javascript">
+        var map, layer;
+
+        function init(){
+
+        	//Using OSM Layer as the basemap
+	        var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
+            
+            //Creating a Map
+			map = new OpenLayers.Map('map', {
+				maxExtent : OSMlayer.maxExtent,
+				units : OSMlayer.units,
+				numZoomLevels : OSMlayer.numZoomLevels,
+				projection: new OpenLayers.Projection("EPSG:3857"),
+		        displayProjection: new OpenLayers.Projection("EPSG:3857"),
+			});
+			
+			map.addLayers([OSMlayer]);
+            
+            //Adding a WMS Service from an ArcGIS Server, with SLD hosted in the web application, not the ArcGIS Server
+            layer = new OpenLayers.Layer.WMS("EcoRegions-Esri WMS", "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/OGC_DevSummit2014/MarineEcoRegions/MapServer/WMSServer", {
+					layers : "0",
+					format : "image/png32",
+					transparent : "true",
+					styles: "polygonSymbolizer", 
+        			SLD: "http://dtc-sci01.esri.com/OGCApps/OpenLayersApp/styles/EcoRegionStyle.xml"			
+				}, {
+					isBaseLayer : false,
+					wrapDateLine : false
+				});
+				
+			map.addLayers([layer]);
+			
+            //Setting my map extent
+            map.zoomToExtent(new OpenLayers.Bounds(-10238892.81285323,2744395.0635501994,-5028944.9649370015,5870363.772299937));
+        }
+    </script>
+	</head>
+	<body  onload="init()">
+
+	  <div id="map"></div>
+  	  <a href="https://github.com/kevinsigwart/EsriOpenLayersClient"><img style="z-index: 1000; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+	  <div id="text">
+			<h1 id="title">WMS with SLD </h1>
+
+			<p id="shortdesc">
+				Demonstrates using WMS service with SLD from ArcGIS Server.
+			</p>
+		</div> 
+	</body>
+</html>
