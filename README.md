@@ -1,14 +1,14 @@
-﻿# Esri Open Layers Client Example
+﻿# Esri Open Layers Client Examples
 
-This example shows how you can bring in OGC Standards coming from an ArcGIS Server into an Open Layers Client.
+These examples shows how you can bring in OGC Standards coming from an ArcGIS Server into an Open Layers Client.
 
-Also, since Esri Rest Specification is now OPEN, it's possible to bring in MapServices and Cached maps into the Open Layers Client.
+Also, since Esri REST Specification aka Geoservices REST Specification adheres to an Open Specification under the Open Web Foundation, it's possible to bring in MapServices and Cached maps into the Open Layers Client.
 
 To get the WFS-T to work, you will need a proxy running on a server.  
 My example uses a .NET IIS Proxy.  I included both a Java proxy and the .ashx proxy.
 
 ## Open Layers Version
-This example uses OpenLayers 2.12
+This example uses OpenLayers 2.13.1
 OpenLayers lives at http://www.openlayers.org/.  Find details on downloading stable releases or the development version the [development site](http://trac.osgeo.org/openlayers/wiki/HowToDownload).
 
 ## Demos
@@ -20,7 +20,8 @@ You can view samples and demos along with the source code [here] (http://dtc-sci
 * [OGC](http://www.opengeospatial.org/)
 * [OpenLayers Repo] (https://github.com/openlayers/openlayers)
 * [Getting Open Layers] (http://www.openlayers.org/)
-
+* [Open Web Foundation] (https://sites.google.com/site/openwebfoundation/)
+* [The Geoservices REST Specification] (http://blogs.esri.com/esri/arcgis/2010/09/07/the-geoservices-rest-specification-an-open-standard-for-gis-web-services/)
 
 ## Issues
 
