@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<title>OpenLayers WMS from ArcGIS Server</title>
-		<link rel="stylesheet" href="theme/css/style.css" type="text/css">
+		<link rel="stylesheet" href="/theme/css/style.css" type="text/css">
 		<style type="text/css">
 			html, body, #map {
 				margin: 0;
@@ -39,40 +39,45 @@
 			}
 		</style>
 
-		<script src="lib/OpenLayers.js"></script>
+		<script src="/lib/OpenLayers.js"></script>
     <script type="text/javascript">
         var map, layer;
+        var layerURL = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer";
 
-        function init(){
+        function init() {
+            var jsonp = new OpenLayers.Protocol.Script();
 
-        	//Using OSM Layer as the basemap
-	        var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
-            
-            //Creating a Map
-			map = new OpenLayers.Map('map', {
-				maxExtent : OSMlayer.maxExtent,
-				units : OSMlayer.units,
-				numZoomLevels : OSMlayer.numZoomLevels,
-				projection: new OpenLayers.Projection("EPSG:3857"),
-		        displayProjection: new OpenLayers.Projection("EPSG:3857"),
-			});
-            
-            /***********************************************************************************************
-             * ArcGIS Online Basemaps are now being served out as WMTS
-             ***********************************************************************************************/
-            var wmts = new OpenLayers.Layer.WMTS({
-                name: "WMTS Ocean Basemap",
-                url: "http://services.arcgisonline.com/arcgis/rest/services/Ocean_Basemap/MapServer/WMTS/",
-                layer: "0",
-                matrixSet: "EPSG:3857",
-                format: "image/png",
-                style: "_null",
-                opacity: 1,
-                isBaseLayer: true
+            jsonp.createRequest(layerURL, {
+                f : 'json',
+                pretty : 'true'
+            }, initMap);
+        }
+        
+        function initMap(layerInfo){
 
-            }); 
+             /***********************************************************************************
+              *ArcGIS Online Basemap (Topographic)
+              ***********************************************************************************/
+            var baseLayer = new OpenLayers.Layer.ArcGISCache("Topo", layerURL, {
+                layerInfo : layerInfo
+            });
+
+
+            /*
+             * Make sure our baselayer and our map are synced up.
+             */
+            map = new OpenLayers.Map('map', {
+                maxExtent : baseLayer.maxExtent,
+                units : baseLayer.units,
+                resolutions : baseLayer.resolutions,
+                numZoomLevels : baseLayer.numZoomLevels,
+                tileSize : baseLayer.tileSize,
+                projection: new OpenLayers.Projection("EPSG:3857"),
+                displayProjection: new OpenLayers.Projection("EPSG:3857"),
+                units: "m"
+            });
 			
-			map.addLayers([wmts]);
+			map.addLayers([baseLayer]);
             
             map.zoomToExtent(new OpenLayers.Bounds(-10238892.81285323,2744395.0635501994,-5028944.9649370015,5870363.772299937));
         }
@@ -82,10 +87,10 @@
 		<div id="map"></div>
   	  <a href="https://github.com/kevinsigwart/EsriOpenLayersClient"><img style="z-index: 1000; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
 		<div id="text">
-			<h1 id="title">Esri WMTS</h1>
+			<h1 id="title">Esri Basemap</h1>
 
 			<p id="shortdesc">
-				Demonstrates using WMTS service from ArcGIS Server.
+				Demonstrates using the Esri Topographic Basemap in OpenLayers.
 			</p>
 		</div> 
 	</body>
