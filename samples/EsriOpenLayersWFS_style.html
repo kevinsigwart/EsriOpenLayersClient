@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<title>OpenLayers WMS from ArcGIS Server</title>
+		<link rel="stylesheet" href="../theme/css/style.css" type="text/css">
+		<style type="text/css">
+			html, body, #map {
+				margin: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#text {
+				position: absolute;
+				bottom: 1em;
+				left: 1em;
+				width: 300px;
+				z-index: 20000;
+			      border:solid 1px #999;
+			      background-color:rgba(227,233,238,.6);
+			      -webkit-border-bottom-left-radius:4px;
+			      -webkit-border-bottom-right-radius:4px;
+			      -moz-border-radius-bottomleft:4px;
+			      -moz-border-radius-bottomright:4px;
+			      -webkit-border-top-left-radius:4px;
+			      -webkit-border-top-right-radius:4px;
+			      -moz-border-radius-topleft:4px;
+			      -moz-border-radius-topright:4px;
+			      border-bottom-left-radius:4px;
+			      border-bottom-right-radius:4px;
+			      border-top-left-radius:4px;
+			      border-top-right-radius:4px;
+			      text-align:center;
+			      height:auto;
+			      margin:0;
+			}
+		</style>
+
+		<script src="../lib/OpenLayers.js"></script>
+    <script type="text/javascript">
+        var map, wfs;
+        var wfsURL = "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/OGC_DevSummit2014/MarineEcoRegions/MapServer/WFSServer?"
+
+        function init(){
+                        
+            //WFS requires a Proxy
+            OpenLayers.ProxyHost= function(url) {
+		          return "/sharing/proxy.ashx?" + url;
+            };
+
+        	//Using OSM Layer as the basemap
+	        var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
+            
+            //Creating a Map
+			map = new OpenLayers.Map('map', {
+				maxExtent : OSMlayer.maxExtent,
+				units : OSMlayer.units,
+				numZoomLevels : OSMlayer.numZoomLevels,
+				projection: new OpenLayers.Projection("EPSG:3857"),
+		        displayProjection: new OpenLayers.Projection("EPSG:3857"),
+			});
+			
+			map.addLayers([OSMlayer]);
+            
+            //Setting up the symbology for WFS
+            var styleMap = new OpenLayers.StyleMap({
+                "default": new OpenLayers.Style({
+                    fillColor: "#336699",
+                    fillOpacity: 0.4, 
+                    hoverFillColor: "white",
+                    hoverFillOpacity: 0.8,
+                    strokeColor: "#003366",
+                    strokeOpacity: 0.8,
+                    strokeWidth: 1.5,
+                    strokeLinecap: "round",
+                    strokeDashstyle: "solid",
+                    hoverStrokeColor: "red",
+                    hoverStrokeOpacity: 1,
+                    hoverStrokeWidth: 0.2,
+                    pointRadius: 6,
+                    hoverPointRadius: 1,
+                    hoverPointUnit: "%",
+                    pointerEvents: "visiblePainted",
+                    cursor: "inherit"
+                })
+            });
+            //WFS Schema is the describe featuretype request, which is folder name:feature type
+            var wfsSchema = wfsURL + "request=describefeaturetype&typename=OGC_DevSummit2014_MarineEcoRegions:MEOW_ECO";
+            
+            //There are a bunch of features.  It's best to zoom in before turning on
+	        wfs = new OpenLayers.Layer.Vector("Esri WFS", {
+                protocol: new OpenLayers.Protocol.WFS({
+                    version : "1.1.0",
+                    srsName : "EPSG:3857",
+                    url: wfsURL,
+			        featurePrefix : "esri",
+			        featureType : "MEOW_ECO",
+			        geometryName : "SHAPE",
+			        schema : wfsSchema
+                }),
+                strategies: [new OpenLayers.Strategy.BBOX()],
+                styleMap: styleMap
+            });
+				
+			map.addLayers([wfs]);
+			
+            map.zoomToExtent(new OpenLayers.Bounds(-10238892.81285323,2744395.0635501994,-5028944.9649370015,5870363.772299937));
+        }
+    </script>
+	</head>
+	<body  onload="init()">
+		<div id="map"></div>
+  	  <a href="https://github.com/kevinsigwart/EsriOpenLayersClient"><img style="z-index: 1000; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+		<div id="text">
+			<h1 id="title">Esri WFS</h1>
+
+			<p id="shortdesc">
+				Demonstrates using WFS service from ArcGIS Server.
+			</p>
+		</div> 
+	</body>
+</html>

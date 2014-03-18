@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<title>OpenLayers WFS-T from ArcGIS Server</title>
+		<link rel="stylesheet" href="../theme/css/style.css" type="text/css">
+        <link rel="stylesheet" href="../theme/css/editToolbarStyler.css" type="text/css">
+		<style type="text/css">
+			html, body, #map {
+				margin: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#text {
+				position: absolute;
+				bottom: 1em;
+				left: 1em;
+				width: 300px;
+				z-index: 20000;
+			      border:solid 1px #999;
+			      background-color:rgba(227,233,238,.6);
+			      -webkit-border-bottom-left-radius:4px;
+			      -webkit-border-bottom-right-radius:4px;
+			      -moz-border-radius-bottomleft:4px;
+			      -moz-border-radius-bottomright:4px;
+			      -webkit-border-top-left-radius:4px;
+			      -webkit-border-top-right-radius:4px;
+			      -moz-border-radius-topleft:4px;
+			      -moz-border-radius-topright:4px;
+			      border-bottom-left-radius:4px;
+			      border-bottom-right-radius:4px;
+			      border-top-left-radius:4px;
+			      border-top-right-radius:4px;
+			      text-align:center;
+			      height:auto;
+			      margin:0;
+			}
+		</style>
+
+		<script src="../lib/OpenLayers.js"></script>
+    <script type="text/javascript">
+        var map, wfs;
+        var wfsURL = "http://dtc-sci02.esri.com/arcgis/services/SiteSelection/MapServer/WFSServer?"
+        
+        var DeleteFeature = OpenLayers.Class(OpenLayers.Control, {
+            initialize: function(layer, options) {
+                OpenLayers.Control.prototype.initialize.apply(this, [options]);
+                this.layer = layer;
+                this.handler = new OpenLayers.Handler.Feature(
+                    this, layer, {click: this.clickFeature}
+                );
+            },
+            clickFeature: function(feature) {
+                // if feature doesn't have a fid, destroy it
+                if(feature.fid == undefined) {
+                    this.layer.destroyFeatures([feature]);
+                } else {
+                    feature.state = OpenLayers.State.DELETE;
+                    this.layer.events.triggerEvent("afterfeaturemodified", 
+                                                   {feature: feature});
+                    feature.renderIntent = "select";
+                    this.layer.drawFeature(feature);
+                }
+            },
+            setMap: function(map) {
+                this.handler.setMap(map);
+                OpenLayers.Control.prototype.setMap.apply(this, arguments);
+            },
+            CLASS_NAME: "OpenLayers.Control.DeleteFeature"
+        });
+        
+        function init(){
+                        
+            //WFS requires a Proxy
+            OpenLayers.ProxyHost= function(url) {
+		          return "/sharing/proxy.ashx?" + url;
+            };
+
+        	//Using OSM Layer as the basemap
+	        var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
+            
+            //Creating a Map
+			map = new OpenLayers.Map('map', {
+				maxExtent : OSMlayer.maxExtent,
+				units : OSMlayer.units,
+				numZoomLevels : OSMlayer.numZoomLevels,
+				projection: new OpenLayers.Projection("EPSG:3857"),
+		        displayProjection: new OpenLayers.Projection("EPSG:3857"),
+			});
+			
+			map.addLayers([OSMlayer]);
+            
+            /*********************************************************************************
+             * WFS-T Example
+             *********************************************************************************/
+
+            //Need Save Strategy for doing edits 
+            var saveStrategy = new OpenLayers.Strategy.Save();
+            saveStrategy.events.register('success',null,function saveFinished(evt){
+                alert("Save Successful");
+            });
+	
+            //Creating WFS-T layer from an ArcGIS Server 10.1.1 Version
+            wfstLayer = new OpenLayers.Layer.Vector("Esri WFS-T", {
+                strategies : [new OpenLayers.Strategy.BBOX(), saveStrategy],
+                projection : new OpenLayers.Projection("EPSG:3857"),
+                protocol : new OpenLayers.Protocol.WFS({
+                    version : "1.1.0",
+                    srsName : "EPSG:3857",
+                    url : wfsURL,
+                    featurePrefix : "esri",
+                    featureType : "SiteLocations",
+                    geometryName : "SHAPE",
+                    schema : wfsURL + "request=describefeaturetype&typename=SiteSelection:SiteLocations"
+                })
+            });
+
+            //When a WFS-T is modified we clear out the attributes.
+            wfstLayer.events.on({
+             'afterfeaturemodified': function(evt) {
+                //We don't want to update the attributes, only the geometry, so we clear them out.
+                //This is because you cannot edit the OBJECTID.  Another option is to just blow out the
+                //ObjectID too.
+                evt.feature.attributes = {};
+             }
+            });
+
+            //Add to Map
+            map.addLayers([wfstLayer]);
+			
+            /**********************************************************************************
+             * Editing Tools
+             **********************************************************************************/
+            var panel = new OpenLayers.Control.Panel({
+                displayClass: 'customEditingToolbar',
+                allowDepress: true
+            });
+
+            var draw = new OpenLayers.Control.DrawFeature(
+                wfstLayer, OpenLayers.Handler.Polygon,
+                {
+                    title: "Draw Feature",
+                    displayClass: "olControlDrawFeaturePolygon",
+                    multi: true
+                }
+            );
+
+
+            var edit = new OpenLayers.Control.ModifyFeature(wfstLayer, {
+                title: "Modify Feature",
+                displayClass: "olControlModifyFeature"
+            });
+
+            var del = new DeleteFeature(wfstLayer, {title: "Delete Feature"});
+
+            var save = new OpenLayers.Control.Button({
+                title: "Save Changes",
+                trigger: function() {
+                    if(edit.feature) {
+                        edit.selectControl.unselectAll();
+                    }
+                    saveStrategy.save();
+                },
+                displayClass: "olControlSaveFeatures"
+            });
+
+            panel.addControls([save, del, edit, draw]);
+
+            //Adding the Editing Toolbar
+            map.addControl(panel);
+            map.zoomToExtent(new OpenLayers.Bounds(-10238892,2744395,-5028944,5870363));
+        }
+    </script>
+	</head>
+	<body  onload="init()">
+		<div id="map"></div>
+  	  <a href="https://github.com/kevinsigwart/EsriOpenLayersClient"><img style="z-index: 1000; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+		<div id="text">
+			<h1 id="title">Esri WFS-T</h1>
+
+			<p id="shortdesc">
+				Demonstrates using and editing a WFS-T service from ArcGIS Server.
+			</p>
+		</div> 
+	</body>
+</html>
