@@ -41,44 +41,49 @@
 
 		<script src="../lib/OpenLayers.js"></script>
     <script type="text/javascript">
-        var map, layer;
-        var layerURL = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer";
+        var map, wfs;
+        var wfsURL = "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/OGC_DevSummit2014/MarineEcoRegions/MapServer/WFSServer?"
 
-        function init() {
-            var jsonp = new OpenLayers.Protocol.Script();
+        function init(){
+                        
+            //WFS requires a Proxy
+            OpenLayers.ProxyHost= function(url) {
+		          return "/sharing/proxy.ashx?" + url;
+            };
 
-            jsonp.createRequest(layerURL, {
-                f : 'json',
-                pretty : 'true'
-            }, initMap);
-        }
-        
-        function initMap(layerInfo){
-
-             /***********************************************************************************
-              *ArcGIS Online Basemap (Topographic)
-              ***********************************************************************************/
-            var baseLayer = new OpenLayers.Layer.ArcGISCache("Topo", layerURL, {
-                layerInfo : layerInfo
-            });
-
-
-            /*
-             * Make sure our baselayer and our map are synced up.
-             */
-            map = new OpenLayers.Map('map', {
-                maxExtent : baseLayer.maxExtent,
-                units : baseLayer.units,
-                resolutions : baseLayer.resolutions,
-                numZoomLevels : baseLayer.numZoomLevels,
-                tileSize : baseLayer.tileSize,
-                projection: new OpenLayers.Projection("EPSG:3857"),
-                displayProjection: new OpenLayers.Projection("EPSG:3857"),
-                units: "m"
-            });
-			
-			map.addLayers([baseLayer]);
+        	//Using OSM Layer as the basemap
+	        var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
             
+            //Creating a Map
+			map = new OpenLayers.Map('map', {
+				maxExtent : OSMlayer.maxExtent,
+				units : OSMlayer.units,
+				numZoomLevels : OSMlayer.numZoomLevels,
+				projection: new OpenLayers.Projection("EPSG:3857"),
+		        displayProjection: new OpenLayers.Projection("EPSG:3857"),
+			});
+			
+			map.addLayers([OSMlayer]);
+            
+            //WFS Schema is the describe featuretype request, which is folder name:feature type
+            var wfsSchema = wfsURL + "request=describefeaturetype&typename=OGC_DevSummit2014_MarineEcoRegions:MEOW_ECO";
+            
+            //There are a bunch of features.  It's best to zoom in before turning on
+	        wfs = new OpenLayers.Layer.Vector("Esri WFS", {
+                protocol: new OpenLayers.Protocol.WFS({
+                    version : "1.1.0",
+                    srsName : "EPSG:3857",
+                    url: wfsURL,
+			        featurePrefix : "esri",
+			        featureType : "MEOW_ECO",
+			        geometryName : "SHAPE",
+			        schema : wfsSchema
+                }),
+                strategies: [new OpenLayers.Strategy.BBOX()]
+            });
+				
+			map.addLayers([wfs]);
+			
             map.zoomToExtent(new OpenLayers.Bounds(-10238892.81285323,2744395.0635501994,-5028944.9649370015,5870363.772299937));
         }
     </script>
@@ -87,10 +92,10 @@
 		<div id="map"></div>
   	  <a href="https://github.com/kevinsigwart/EsriOpenLayersClient"><img style="z-index: 1000; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
 		<div id="text">
-			<h1 id="title">Esri Basemap</h1>
+			<h1 id="title">Esri WFS</h1>
 
 			<p id="shortdesc">
-				Demonstrates using the Esri Topographic Basemap in OpenLayers.
+				Demonstrates using WFS service from ArcGIS Server.
 			</p>
 		</div> 
 	</body>
