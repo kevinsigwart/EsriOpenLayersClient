@@ -1,0 +1,118 @@
+        .olControlPanel {
+            float: left;
+            left: 60px;
+            height: 30px; 
+            top: 20px;
+            cursor: pointer;
+            #border-radius: 20px;
+            #background-color: rgba(227,233,238,.6);
+    	}
+    	.olControlPanel div  {
+            float: left;
+            margin:5px;
+            width: 90px;
+            height: 20px;
+            padding: 5px;
+            background-color: rgba(227,233,238,.8);
+            border-radius: 20px;
+    	}
+        .olControlButton319ItemActive { 
+            background-image: url(../img/319Activated.png);            
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton319ItemInactive { 
+            background-image: url(../img/319NotAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton320ItemActive { 
+            background-image: url(../img/320Activated.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton320ItemInactive { 
+            background-image: url(../img/320NotAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton321ItemActive { 
+            background-image: url(../img/321Activated.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton321ItemInactive { 
+            background-image: url(../img/321NotAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton322ItemActive { 
+            background-image: url(../img/322Activated.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButton322ItemInactive { 
+            background-image: url(../img/322NotAct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .depthPanel{
+            
+            float: left;
+            width: 50px;
+            left: 10px;
+            height: 30px; 
+            top: 75px;
+            cursor: pointer;
+            #border-radius: 20px;
+            #background-color: rgba(255, 255, 255, .6);
+    	}
+    	.depthPanel div  {
+            float: left;
+            margin:5px;
+            width: 75px;
+            height: 20px;
+            background-color: rgba(227,233,238,.8);
+            border-radius: 20px;
+            padding: 5px;
+    	}
+        .olControlButtonDepth-0ItemActive { 
+            background-image: url(../img/0mActive.png);            
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButtonDepth-0ItemInactive { 
+            background-image: url(../img/0mNotActive.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButtonDepth-100ItemActive { 
+            background-image: url(../img/100mActive.png);            
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButtonDepth-100ItemInactive { 
+            background-image: url(../img/100mNotActive.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButtonDepth-500ItemActive { 
+            background-image: url(../img/500mActive.png);            
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButtonDepth-500ItemInactive { 
+            background-image: url(../img/500mNotActive.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButtonDepth-1000ItemActive { 
+            background-image: url(../img/1000mActive.png);            
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .olControlButtonDepth-1000ItemInactive { 
+            background-image: url(../img/1000mNotActive.png);
+            background-repeat: no-repeat;
+            background-position: center;
+        }

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<title>OpenLayers WMS from ArcGIS Server</title>
+		<link rel="stylesheet" href="../theme/css/style.css" type="text/css">
+		<link rel="stylesheet" href="../theme/css/multiDimStyler.css" type="text/css">
+		<style type="text/css">
+			html, body, #map {
+				margin: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#text {
+				position: absolute;
+				bottom:1em;
+				left: 1em;
+				width: 350px;
+				z-index: 20000;
+			      border:solid 1px #999;
+			      background-color:rgba(227,233,238,.8);
+			      -webkit-border-bottom-left-radius:4px;
+			      -webkit-border-bottom-right-radius:4px;
+			      -moz-border-radius-bottomleft:4px;
+			      -moz-border-radius-bottomright:4px;
+			      -webkit-border-top-left-radius:4px;
+			      -webkit-border-top-right-radius:4px;
+			      -moz-border-radius-topleft:4px;
+			      -moz-border-radius-topright:4px;
+			      border-bottom-left-radius:4px;
+			      border-bottom-right-radius:4px;
+			      border-top-left-radius:4px;
+			      border-top-right-radius:4px;
+			      text-align:center;
+			      height:auto;
+			      margin:0;
+			}
+		</style>
+
+		<script src="../lib/OpenLayers.js"></script>
+    <script type="text/javascript">
+		var map;
+		var innundationWMS;
+		var button319,button320,button321,button322;
+        var buttonDepth0,buttonDepth100,buttonDepth500,button1000;
+        
+        /**
+         * Updates the WMS time according to the button pressed.  
+         */
+        function updateTime(evt) {
+            
+            //Deactivates all the buttons, activates the button
+            deactivateTimeButtons(); 
+            
+			if(this.title == '319')
+				innundationWMS.params.DIM_TIME = "3/19/2013";
+			else if(this.title == '320')
+				innundationWMS.params.DIM_TIME = "3/20/2013";
+			else if(this.title == '321')
+				innundationWMS.params.DIM_TIME = "3/21/2013";
+			else if(this.title == '322')
+				innundationWMS.params.DIM_TIME = "3/22/2013";
+            
+            //Activate Button Clicked
+			this.activate();
+			
+			innundationWMS.redraw(true);
+		}
+        
+        /**
+         * Updates the depth according to the button pressed.  
+         */
+        function updateDepth(evt) {
+            
+            //Deactivates all the buttons, activates the button
+            deactivateDepthButtons(); 
+            
+			if(this.title == 'Depth-0')
+				innundationWMS.params.DIM_DEPTH = "0";
+			else if(this.title == 'Depth-100')
+				innundationWMS.params.DIM_DEPTH = "100";
+			else if(this.title == 'Depth-500')
+				innundationWMS.params.DIM_DEPTH = "500";
+			else if(this.title == 'Depth-1000')
+				innundationWMS.params.DIM_DEPTH = "1000";
+            
+            //Activate Button Clicked
+			this.activate();
+			
+			innundationWMS.redraw(true);
+		}
+        
+        /**
+         * Deactivates all the Time buttons
+         */
+        function deactivateTimeButtons() {
+            
+            button319.deactivate();
+            button320.deactivate();
+			button321.deactivate();
+            button322.deactivate();
+        }
+        
+        /**
+         * Deactivates all the Depth buttons
+         */
+        function deactivateDepthButtons(){
+            buttonDepth0.deactivate();
+            buttonDepth100.deactivate();
+			buttonDepth500.deactivate();
+            buttonDepth1000.deactivate();           
+        }
+		
+        function init() {
+        	//Using OSM Layer as the basemap
+	        var OSMlayer = new OpenLayers.Layer.OSM( "Simple OSM Map");
+            
+            //Creating a Map
+			map = new OpenLayers.Map('map', {
+				maxExtent : OSMlayer.maxExtent,
+				units : OSMlayer.units,
+				numZoomLevels : OSMlayer.numZoomLevels,
+				projection: new OpenLayers.Projection("EPSG:3857"),
+		        displayProjection: new OpenLayers.Projection("EPSG:3857"),
+			});
+			
+			map.addLayers([OSMlayer]);
+            
+			//Time enabled WMS of Projected Inundation coming from an Esri ArcGIS Server 10.1
+			innundationWMS = new OpenLayers.Layer.WMS("Multi-Dim WMS", "http://sampleserver6.arcgisonline.com/arcgis/services/MultiDimensional_Sample/MapServer/WMSServer", {
+				layers : "0",
+				format : "image/gif",
+				transparent : "true",
+				DIM_TIME : "3/19/2013",
+                DIM_DEPTH : "0",
+			}, {
+				opacity : 0.75,
+				isBaseLayer : false,
+				wrapDateLine : false
+			});
+			
+			innundationWMS.setVisibility(true);
+			map.addLayers([innundationWMS]);
+			
+            map.zoomToExtent(new OpenLayers.Bounds(-8502582, 4421100, -8478963, 4437515));
+            
+            //Adding Time Buttons to initiate time changes
+        	button319 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButton319",title:"319", trigger: updateTime 
+			});
+			button320 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButton320",title:"320", trigger: updateTime
+			});
+			button321 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButton321",title:"321", trigger: updateTime
+			});
+			button322 = new OpenLayers.Control.Button({
+						'displayClass': 'olControlButton322',title:"322", trigger: updateTime
+			});
+
+			
+			//The time panel will have a button for years 2000 - 3000 in 25 year intervals
+			var timePanel = new OpenLayers.Control.Panel({defaultControl: button319});
+			timePanel.addControls([button319,button320,button321,button322]);
+			
+			//Adding the Time Toolbar
+    		map.addControl(timePanel);
+            
+            //Adding Depth Buttons to initiate Depth changes
+        	buttonDepth0 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButtonDepth-0",title:"Depth-0", trigger: updateDepth 
+			});
+			buttonDepth100 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButtonDepth-100",title:"Depth-100", trigger: updateDepth
+			});
+			buttonDepth500 = new OpenLayers.Control.Button({
+				'displayClass': "olControlButtonDepth-500",title:"Depth-500", trigger: updateDepth
+			});
+			buttonDepth1000 = new OpenLayers.Control.Button({
+				'displayClass': 'olControlButtonDepth-1000',title:"Depth-1000", trigger: updateDepth
+			});
+            
+            //Add a depth panel
+            var depthPanel = new OpenLayers.Control.Panel({defaultControl: buttonDepth0,'displayClass':'depthPanel'});
+            depthPanel.addControls([buttonDepth0,buttonDepth100,buttonDepth500,buttonDepth1000]);
+            map.addControl(depthPanel);
+            
+            map.zoomToExtent(new OpenLayers.Bounds(-9449100,3640204,-7096063,5203188));
+        }
+    </script>
+	</head>
+	<body  onload="init()">
+		<div id="map"></div>
+		<div id="text">
+			<h1 id="title">Multidimensional WMS</h1>
+
+			<p id="shortdesc">
+				Demonstrates using a multidimensional WMS from ArcGIS Server. Use the time panel and depth panel on the upper left side to change the slice of data. 
+			</p>
+		</div> 
+		<a href="https://github.com/kevinsigwart/EsriOpenLayersClient"><img style="z-index: 2001; position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+	</body>
+</html>
