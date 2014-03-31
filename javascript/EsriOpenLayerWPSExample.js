@@ -22,7 +22,7 @@ function init(){
     map.addLayers([OSMlayer]);
 
     //Soil Moisture WMS, cooresponds to the result from the WPS
-    layer = new OpenLayers.Layer.WMS("Soil Moisture", "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/GLDAS_2014/SoilMoisture/MapServer/WMSServer", {
+    layer = new OpenLayers.Layer.WMS("Soil Moisture", "http://dtc-sci02.esri.com/arcgis/services/201307_GLDAS_Multidimensional/SoilMoisture/MapServer/WMSServer", {
             layers : "0",
             format : "image/png32",
             transparent : "true"		
@@ -118,7 +118,7 @@ function buildExecuteRequest(x,y){
     
     //Make the post request
     var request = OpenLayers.Request.POST({
-        url: "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/GLDAS_2014/MakeNetCDFTable/GPServer/WPSServer",
+        url: "http://dtc-sci02.esri.com/arcgis/services/OGC_DevSummit2014/MakeNetCDFTable/GPServer/WPSServer",
         data: execute,
         callback: handleResult
     })
@@ -157,15 +157,15 @@ function parseResult(response){
     }
     else
     {
-        results = xmlDoc.getElementsByTagName("GLDAS_2014_MakeNetCDFTable:out_table")
+        results = xmlDoc.getElementsByTagName("OGC_DevSummit2014_MakeNetCDFTable:out_table")
         for(var index=0; index < results.length; index++)
         {
             var plotPoint = [];
-            var timeString  = results[index].getElementsByTagName("GLDAS_2014_MakeNetCDFTable:time")[0].childNodes[0].nodeValue;
+            var timeString  = results[index].getElementsByTagName("OGC_DevSummit2014_MakeNetCDFTable:time")[0].childNodes[0].nodeValue;
             var dateTimeNum = Date.parse(timeString);
 		    var dateTime = new Date(dateTimeNum);
             plotPoint.time = dateTime;
-            plotPoint.value = results[index].getElementsByTagName("GLDAS_2014_MakeNetCDFTable:SoilMoist1_GDS0_DBLY")[0].childNodes[0].nodeValue;
+            plotPoint.value = results[index].getElementsByTagName("OGC_DevSummit2014_MakeNetCDFTable:SoilMoist1_GDS0_DBLY")[0].childNodes[0].nodeValue;
             chartPoints[index] = plotPoint;
         }        
     }

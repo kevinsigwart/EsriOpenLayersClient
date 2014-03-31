@@ -106,7 +106,7 @@ function initMap(layerInfo) {
 	 *  styling through SLD
 	 *********************************************************************************************/
 	//A WMS Polygon coming from a 10.2.1 ArcGIS Server
-	wmsEcoRegions = new OpenLayers.Layer.WMS("EcoRegions-Esri WMS", "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/OGC_DevSummit2014/MarineEcoRegions/MapServer/WMSServer", {
+	wmsEcoRegions = new OpenLayers.Layer.WMS("EcoRegions-Esri WMS", "http://dtc-sci02.esri.com/arcgis/services/OGC_DevSummit2014/MarineEcoRegions/MapServer/WMSServer", {
 		layers : "0",
 		format : "image/png32",
 		transparent : "true",
@@ -154,11 +154,11 @@ function initMap(layerInfo) {
         protocol: new OpenLayers.Protocol.WFS({
 			version : "1.1.0",
 			srsName : "EPSG:3857",
-            url: "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/OGC_DevSummit2014/LargeMarineEcoSystems/MapServer/WFSServer?",
+            url: "http://dtc-sci02.esri.com//arcgis/services/OGC_DevSummit2014/LargeMarineEcoSystems/MapServer/WFSServer?",
 			featurePrefix : "esri",
 			featureType : "LIM_Generalized",
 			geometryName : "SHAPE",
-			schema : "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/services/OGC_DevSummit2014/LargeMarineEcoSystems/MapServer/WFSServer?request=describefeaturetype&typename=OGC_DevSummit2014_LargeMarineEcoSystems:LIM_Generalized"
+			schema : "http://dtc-sci02.esri.com/arcgis/services/OGC_DevSummit2014/LargeMarineEcoSystems/MapServer/WFSServer?request=describefeaturetype&typename=OGC_DevSummit2014_LargeMarineEcoSystems:LIM_Generalized"
             //featureNS: "http://www.openplans.org/topp"
         }),
         strategies: [new OpenLayers.Strategy.BBOX()],
@@ -214,7 +214,7 @@ function initMap(layerInfo) {
 	 * Esri Dynamic Map Service
 	 *******************************************************************************************/
 	//An Esri Map Service using Esri Geoservices Rest Specification from a 10.2.1 ArcGIS Server
-	var esriMapService = new OpenLayers.Layer.ArcGIS93Rest("pH Change ArcGIS MapService", "http://arcgis-ags1021fedscience-293093884.us-east-1.elb.amazonaws.com/arcgis/rest/services/OGC_DevSummit2014/pH_ChangeMap_NoCache/MapServer/export", {
+	var esriMapService = new OpenLayers.Layer.ArcGIS93Rest("pH Change ArcGIS MapService", "http://dtc-sci02.esri.com/arcgis/rest/services/OGC_DevSummit2014/pH_Change_Map_NoCache/MapServer/export", {
 	    layers: "show:0",
 		transparent:true,		
 		isBaseLayer:false
