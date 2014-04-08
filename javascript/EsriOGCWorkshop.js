@@ -123,7 +123,8 @@ function initMap(layerInfo) {
 	 *
 	 */
 	var baseLayer = new OpenLayers.Layer.ArcGISCache("ArcGIS Cached Gray Map", layerURL, {
-		layerInfo : layerInfo
+		layerInfo : layerInfo,
+        attribution: "Sources: Esri, DeLorme, HERE, MapmyIndia"
 	});
 	
 	

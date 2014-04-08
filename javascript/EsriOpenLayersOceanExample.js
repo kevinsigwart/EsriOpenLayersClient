@@ -64,7 +64,8 @@ function initMap(layerInfo) {
 	  *ArcGIS Online Basemap (Light Gray)
 	  ***********************************************************************************/
 	var baseLayer = new OpenLayers.Layer.ArcGISCache("ArcGIS Cached Gray Map", layerURL, {
-		layerInfo : layerInfo
+		layerInfo : layerInfo,
+        attribution:"Sources: Esri, DeLorme, HERE, MapmyIndia"
 	});
 	
 	
@@ -93,7 +94,8 @@ function initMap(layerInfo) {
         format: "image/png",
         style: "_null",
         opacity: 1,
-        isBaseLayer: true
+        isBaseLayer: true,
+        attribution:"Sources: GEBCO, NOAA NGDC, IHO-IOC GEBCO, NGS, Esri, DeLorme"
         
     }); 
     wmts.setVisibility(false);
